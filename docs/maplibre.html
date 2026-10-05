@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Map</title>
+    <title>New Mexico County Population</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@^6.10.0/dist/maplibre-gl.css" />
     <style>
@@ -14,29 +14,44 @@
 
     <script type="module">
     // Customizations:
-    // 1. 
-    // 2. 
-    // 3.
+    // 1. Centered, tilted, and rotated the map over New Mexico.
+    // 2. Added a scale-bar control.
+    // 3. Customized the county fill and outline colors.
 
         import * as maplibregl from 'https://unpkg.com/maplibre-gl@^6.10.0/dist/maplibre-gl.mjs';
 
-       // TODO: Update the default map settings
+       // TODONE: Update the default map settings
         const map = new maplibregl.Map({
             container: 'map',
             style: 'https://tiles.openfreemap.org/styles/positron',
-            center: [0, 0],
+            center: [-106.10, 34.45],
             zoom: 5,
-            pitch: 0,
-            bearing: 0
+            pitch: 35,
+            bearing: -12
         });
         window.map = map;   // exposes map to the browser console for debugging
 
-       // TODO: Update and add an additional control feature
-        map.on('load', function () {
+       // TODOBRoke:
             map.addControl(new maplibregl.NavigationControl(), 'top-left');
-        });
+            map.addControl(new maplibregl.ScaleControl({ maxWidth: 150, unit: 'imperial' }), 'bottom-left');
+        map.on('load', () => {
+            map.addSource('county_pop', {
+                type: 'geojson',
+                data: 'data/popul_byco2018.geojson'})
+            });
 
-        // TODO: Update the Default Colors
+            map.addLayer({
+                id: 'county_pop', type: 'fill', source: 'county_pop',
+                paint: {'fill-color': '#9e9ac8',
+                        'fill-opacity': 0.60}
+            });
+
+            map.addLayer({
+                id: 'county_lines', type: 'line', source: 'county_pop',
+                paint: {'line-color': '#54278f',
+                        'line-width': 2}
+            });
+     // TODONE: Update the correct popup fields
         map.on('load', () => {
             map.addSource('county_pop', {
                 type: 'geojson',
@@ -52,16 +67,36 @@
                 id: 'county_lines', type: 'line', source: 'county_pop',
                 paint: { }
             });
-
+        });   
         // TODO: Update the correct popup fields
-        map.on('click', 'county_pop', function (e) {
+ map.on('click', 'county_pop', function (e) {
+                const properties = e.features[0].properties;
+
+                const countyName = properties.cowntee_NA;
+                const population = Number(
+                    properties.popul_byco
+                ).toLocaleString();
+
                 new maplibregl.Popup()
                     .setLngLat(e.lngLat)
-                    .setHTML(`Name: ${e.features[0].properties.name}<br>
-                    Population: ${e.features[0].properties.population}`)
+                    .setHTML(`
+                        <h3>${countyName} County</h3>
+                        <p>
+                            <strong>Population:</strong>
+                            ${population}
+                        </p>
+                    `)
                     .addTo(map);
             });
-        });
+
+            // Change cursor when hovering over a county
+            map.on('mouseenter', 'county_pop', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            map.on('mouseleave', 'county_pop', function () {
+                map.getCanvas().style.cursor = '';
+            });
     </script>
 </body>
 </html>
