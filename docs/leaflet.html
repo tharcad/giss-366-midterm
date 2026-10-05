@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Leaflet Example Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-ajax@2.1.0/dist/leaflet.ajax.min.js"></script>
+  <style>
+    body { margin: 0; }
+    #map { height: 100vh; width: 100vw; }
+    #title {
+        position: fixed;
+        top: 10px;
+        left: 55px;
+        z-index: 800;
+        margin: 0;
+        padding: 10px 15px;
+        background: rgba(255, 255, 255, .5);
+        border: 1px solid grey;
+        border-radius: 3px;
+    }
+  </style>
+  
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- TODO: update this title -->
+  <div id="title">
+     <h1>[TODO: map title]</h1>
+     <p>[TODO: one or two sentences, data source, your name]</p>
+   </div>
+  <script>
+    
+    //TODO: Update these default zoom settings 
+    const map = L.map('map').setView([32.7701, -108.2803], 11); 
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // TODO: Update the Default Colors
+    const countyLayer = new L.GeoJSON.AJAX('data/popul_byco2018.geojson', {
+        style: {
+         //This loads a default Leaflet blue, update the style here
+        }
+        }).addTo(map);
+
+    // TODO: Update the correct popup fields
+        countyLayer.on('click', (e) => {
+            const feature = e.layer.feature;
+            const popupContent = `
+                <h3>${feature.properties.name}</h3>
+                <p>Population: ${feature.properties.population}</p>
+            `;
+            e.layer.bindPopup(popupContent).openPopup();
+    });
+  </script>
+</body>
+</html>

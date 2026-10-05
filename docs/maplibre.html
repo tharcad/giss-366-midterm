@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@^6.10.0/dist/maplibre-gl.css" />
+    <style>
+        body { margin: 0; }
+        #map { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script type="module">
+    // Customizations:
+    // 1. 
+    // 2. 
+    // 3.
+
+        import * as maplibregl from 'https://unpkg.com/maplibre-gl@^6.10.0/dist/maplibre-gl.mjs';
+
+       // TODO: Update the default map settings
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/positron',
+            center: [0, 0],
+            zoom: 5,
+            pitch: 0,
+            bearing: 0
+        });
+        window.map = map;   // exposes map to the browser console for debugging
+
+       // TODO: Update and add an additional control feature
+        map.on('load', function () {
+            map.addControl(new maplibregl.NavigationControl(), 'top-left');
+        });
+
+        // TODO: Update the Default Colors
+        map.on('load', () => {
+            map.addSource('county_pop', {
+                type: 'geojson',
+                data: 'data/popul_byco2018.geojson'
+            });
+
+            map.addLayer({
+                id: 'county_pop', type: 'fill', source: 'county_pop',
+                paint: { }
+            });
+
+            map.addLayer({
+                id: 'county_lines', type: 'line', source: 'county_pop',
+                paint: { }
+            });
+
+        // TODO: Update the correct popup fields
+        map.on('click', 'county_pop', function (e) {
+                new maplibregl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(`Name: ${e.features[0].properties.name}<br>
+                    Population: ${e.features[0].properties.population}`)
+                    .addTo(map);
+            });
+        });
+    </script>
+</body>
+</html>
